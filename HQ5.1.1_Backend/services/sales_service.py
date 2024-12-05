@@ -1,1 +1,1 @@
-# Business logic for vendor-related operations
+# Business logic for sales
