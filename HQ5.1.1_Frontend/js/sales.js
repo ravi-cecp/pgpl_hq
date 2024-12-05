@@ -1,0 +1,1 @@
+# Handles notifications-related interactivity

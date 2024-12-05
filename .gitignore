@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+
+# IDE settings
+.idea/
+.vscode/
+
+# Logs and runtime files
+*.log
+*.sqlite3
+
+# Static assets generated dynamically
+staticfiles/
+
+# Node.js dependencies
+node_modules/

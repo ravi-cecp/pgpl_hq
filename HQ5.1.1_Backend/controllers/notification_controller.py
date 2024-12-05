@@ -1,0 +1,1 @@
+# Manages notifications-related endpoints

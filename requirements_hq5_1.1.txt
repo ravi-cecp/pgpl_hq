@@ -1,0 +1,13 @@
+Flask
+Flask-Cors
+pymongo
+bcrypt
+rapidfuzz
+pandas
+openpyxl
+gunicorn
+Werkzeug
+python-dotenv
+pytest
+pytest-mock
+requests
