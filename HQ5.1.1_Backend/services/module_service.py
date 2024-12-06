@@ -5,16 +5,38 @@
 from flask import jsonify
 from models.module_model import Module
 from models.user_model import User
+from utils.db_utils import db
 
-def get_modules_for_user(user_id):
-    user = User.objects(id=user_id).first()
+def get_all_modules():
+    """
+    Fetches all modules from the database.
+    """
+    try:
+        modules = list(db.modules.find({}, {"_id": 0}))  # Exclude the MongoDB `_id` field
+        return modules
+    except Exception as e:
+        print(f"Error fetching modules: {e}")
+        return []
+        
+        
+
+
+def get_modules_for_user(username):
+    """
+    Retrieves the list of modules accessible to a user based on their role.
+    """
+    # Fetch the user's role from the database
+    user = db.users.find_one({"username": username})
     if not user:
-        return jsonify({'error': 'User not found'}), 404
+        return {"error": "User not found"}
 
-    if not user.approved:
-        return jsonify({'error': 'User is not approved'}), 403
+    # Fetch the role details from the database
+    role = db.roles.find_one({"name": user["role"]})
+    if not role or "modules" not in role:
+        return {"error": "Role or module access not defined for the user"}
 
-    modules = Module.objects(roles_allowed=user.role)
-    module_list = [{'id': str(module.id), 'name': module.name, 'description': module.description} for module in modules]
-    return jsonify({'modules': module_list}), 200
-# End of module_service.py
+    # Return the list of modules
+    return {
+        "role": role["name"],
+        "modules": role.get("modules", [])
+    }

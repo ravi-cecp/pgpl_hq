@@ -11,8 +11,10 @@ from pymongo import MongoClient
 from controllers.auth_controller import auth_bp
 from controllers.user_controller import user_bp
 from controllers.role_controller import role_bp
+from controllers.module_controller import module_bp
 from configs.settings import AppConfig
 from datetime import datetime
+from utils.db_utils import db
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -34,6 +36,7 @@ db = client[app.config["DB_NAME"]]
 app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(user_bp, url_prefix="/user")
 app.register_blueprint(role_bp, url_prefix='/role')
+app.register_blueprint(module_bp)
 
 
 # Health Check Endpoint
@@ -45,9 +48,85 @@ def health_check():
     return jsonify({"message": "HQ Backend is running!"}), 200
 
 
+def initialize_roles_modules_and_users():
+    """
+    Initializes the required roles, modules, and test users.
+    Creates a default Super Admin user if not present.
+    """
+    roles_collection = db.roles
+    modules_collection = db.modules
+    users_collection = db.users
+
+    # Define modules
+    modules = [
+        {"id": 1, "name": "Sales", "description": "Placeholder description for Sales module."},
+        {"id": 2, "name": "Sourcing", "description": "Placeholder description for Sourcing module."},
+        {"id": 3, "name": "Ops Head", "description": "Placeholder description for Ops Head module."},
+        {"id": 4, "name": "Finance", "description": "Placeholder description for Finance module."},
+        {"id": 5, "name": "Logistics", "description": "Placeholder description for Logistics module."},
+        {"id": 6, "name": "Tech Admin", "description": "Placeholder description for Tech Admin module."},
+        {"id": 7, "name": "App System", "description": "Placeholder description for App System module."},
+        {"id": 8, "name": "Vault", "description": "Placeholder description for Vault module."},
+    ]
+
+    # Define roles and their access to modules
+    roles = [
+        {"name": "Super Admin", "modules": [module["name"] for module in modules], "description": "Placeholder description for Super Admin."},
+        {"name": "Admin", "modules": [module["name"] for module in modules if module["name"] not in ["App System", "Vault"]], "description": "Placeholder description for Admin."},
+        {"name": "Tech Admin", "modules": ["App System"], "description": "Placeholder description for Tech Admin."},
+        {"name": "Sales", "modules": ["Sales"], "description": "Placeholder description for Sales."},
+        {"name": "Sourcing", "modules": ["Sourcing"], "description": "Placeholder description for Sourcing."},
+        {"name": "Ops Head", "modules": ["Sourcing", "Logistics"], "description": "Placeholder description for Ops Head."},
+        {"name": "Finance", "modules": ["Finance"], "description": "Placeholder description for Finance."},
+        {"name": "Logistics", "modules": ["Logistics"], "description": "Placeholder description for Logistics."},
+    ]
+
+    # Create test users for each role
+    test_users = [
+        {"username": f"{role['name'].replace(' ', '').lower()}_test", "password": "123", "email": "hq_test@daily.com", "role": role["name"], "approved": True, "status": "created and approved at app initialization", "created_at": datetime.utcnow()} 
+        for role in roles
+    ]
+
+    # Insert modules if not already present
+    existing_modules = list(modules_collection.find({}, {"_id": 0, "name": 1}))
+    existing_module_names = {module['name'] for module in existing_modules}
+    new_modules = [module for module in modules if module['name'] not in existing_module_names]
+    if new_modules:
+        modules_collection.insert_many(new_modules)
+        print("Modules initialized.")
+
+    # Insert roles if not already present
+    existing_roles = list(roles_collection.find({}, {"_id": 0, "name": 1}))
+    existing_role_names = {role['name'] for role in existing_roles}
+    new_roles = [role for role in roles if role['name'] not in existing_role_names]
+    if new_roles:
+        roles_collection.insert_many(new_roles)
+        print("Roles initialized.")
+
+    # Insert Super Admin user if not already present
+    if not users_collection.find_one({"username": "superadmin"}):
+        users_collection.insert_one({
+            "username": "superadmin",
+            "password": "123",  # Replace with a secure password
+            "email": "hq_test@daily.com",
+            "role": "Super Admin",
+            "approved": True,
+            "status": "created and approved at app initialization",
+            "created_at": datetime.utcnow()
+        })
+        print("Super Admin user created successfully.")
+
+    # Insert test users if not already present
+    existing_users = list(users_collection.find({}, {"_id": 0, "username": 1}))
+    existing_usernames = {user['username'] for user in existing_users}
+    new_users = [user for user in test_users if user['username'] not in existing_usernames]
+    if new_users:
+        users_collection.insert_many(new_users)
+        print("Test users created successfully.")
+    
+    print("Roles, modules, and test users initialized successfully.")
 
 
-def initialize_roles_and_super_admin():
     """
     Initializes the required roles and creates a default Super Admin user if not present.
     """
@@ -71,8 +150,8 @@ def initialize_roles_and_super_admin():
         })
         print("Super Admin user created successfully.")
 
-# Initialize roles and Super Admin at startup
-initialize_roles_and_super_admin()
+# Initialize roles,  modules and users.
+initialize_roles_modules_and_users()
 
 @app.route("/")
 def index():

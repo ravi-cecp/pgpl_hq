@@ -3,9 +3,24 @@
 # Defines the schema for application modules.
 
 from configs.database import db
+from pymongo import MongoClient
+from configs.settings import AppConfig
 
-class Module(db.Document):
-    name = db.StringField(required=True, unique=True)
-    description = db.StringField()
-    roles_allowed = db.ListField(db.ReferenceField('Role'))
-# End of module_model.py
+# MongoDB connection setup
+client = MongoClient(AppConfig.DB_URI)
+db = client[AppConfig.DB_NAME]
+
+class Module:
+    @staticmethod
+    def get_all_modules():
+        """
+        Fetch all modules from the database.
+        """
+        return list(db.modules.find({}, {"_id": 0}))
+
+    @staticmethod
+    def insert_module(module):
+        """
+        Insert a new module into the database.
+        """
+        return db.modules.insert_one(module)

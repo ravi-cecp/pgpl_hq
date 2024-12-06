@@ -66,6 +66,31 @@ def logout_user():
     session.clear()
     return jsonify({"message": "User logged out successfully"}), 200
 
+
+
+@auth_bp.route('/assign-role', methods=['POST'])
+def assign_role():
+    """Assign a role to a user."""
+    data = request.get_json()
+    username = data.get("username")
+    role = data.get("role")
+
+    if not username or not role:
+        return jsonify({"message": "Username and role are required", "status": "error"}), 400
+
+    # Database access
+    user = users_collection.find_one({"username": username})
+    if not user:
+        return jsonify({"message": f"User '{username}' not found", "status": "error"}), 404
+
+    # Update user's role
+    users_collection.update_one({"username": username}, {"$set": {"role": role}})
+    return jsonify({"message": f"Role '{role}' assigned to user '{username}' successfully.", "status": "success"}), 200
+
+
+
+
+
 @auth_bp.route('/user', methods=['GET'])
 def get_user():
     """

@@ -9,7 +9,7 @@ from services.user_service import UserService
 from pymongo import MongoClient
 
 client = MongoClient("mongodb://localhost:27017")
-db = client["hq_app"]
+db = client["hq_database"]
 
 user_bp = Blueprint("user", __name__)
 

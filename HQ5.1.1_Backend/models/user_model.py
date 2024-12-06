@@ -5,6 +5,16 @@ from configs.settings import AppConfig
 client = MongoClient(AppConfig.DB_URI)
 db = client[AppConfig.DB_NAME]
 users_collection = db["users"]
+from utils.db_utils import db
+
+class User:
+    @staticmethod
+    def get_user_by_username(username):
+        return db.users.find_one({"username": username})
+
+    @staticmethod
+    def create_user(user_data):
+        return db.users.insert_one(user_data)
 
 class UserModel:
     @staticmethod

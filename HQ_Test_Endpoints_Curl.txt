@@ -9,54 +9,10 @@ curl -X GET http://127.0.0.1:5000/
 
 
 
-#  test the Super Admin login: 
-curl -X POST http://127.0.0.1:5000/auth/login -H "Content-Type: application/json" -d "{\"username\": \"superadmin\", \"password\": \"123\"}"
-Expected response: {    "message": "Login successful",    "status": "success",    "role": "Super Admin"}
-
-
-# User Registration (POST)
-curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"testuser2\", \"password\": \"testpassword2\", \"role\": \"sales\"}"
-# Expected Response: { "message": "User registered successfully.", "status": "success" }
-
-curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"super_admin_test\", \"password\": \"123\", \"role\": \"Super Admin\"}"
-curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"admin_test\", \"password\": \"123\", \"role\": \"Admin\"}"
-curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"sales_test\", \"password\": \"123\", \"role\": \"Sales\"}"
-curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"sourcing_test\", \"password\": \"123\", \"role\": \"Sourcing\"}"
-curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"ops_head_test\", \"password\": \"123\", \"role\": \"Ops Head\"}"
-curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"logistics_test\", \"password\": \"123\", \"role\": \"Logistics\"}"
-curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"finance_test\", \"password\": \"123\", \"role\": \"Finance\"}"
-
-
-
-# User Login (POST)
-curl -X POST http://127.0.0.1:5000/auth/login -H "Content-Type: application/json" -d "{\"username\": \"testuser1\", \"password\": \"testpassword1\"}"
-# Expected Response: if user is approved { "message": "Login successful.", "token": "<JWT_TOKEN>" }
-# Expected Response: If the user is not approved yet:{  "error": "User not approved by Super Admin."}
-
-
-# Approve User (POST, Super Admin Only)
-curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"testuser1\"}"
-# Expected Response: { "message": "User approved successfully.", "status": "success" }
-
-curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"super_admin_test\"}"
-curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"admin_test\"}"
-curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"sales_test\"}"
-curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"sourcing_test\"}"
-curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"ops_head_test\"}"
-curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"logistics_test\"}"
-curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"finance_test\"}"
-curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"testuser2\"}"
-
-
 # Fetch All Users Endpoint (Super Admin Only)
 curl -X GET http://127.0.0.1:5000/user/users
-
 # Expected response: [   {    "username": "testuser",    "role": "admin",    "status": "approved"  },  {    "username": "user2",    "role": "sales",    "status": "pending"  }]
 
-
-# Add Module (POST, Super Admin Only)
-curl -X POST http://127.0.0.1:5000/module/add -H "Content-Type: application/json" -d "{\"name\": \"Finance\", \"description\": \"Finance module description\"}"
-# Expected Response: { "message": "Module added successfully.", "status": "success" }
 
 
 # Get Roles (GET)
@@ -64,37 +20,65 @@ curl -X GET http://127.0.0.1:5000/role/list
 # Expected Response:[  {    "role_name": "super_admin"  },  {    "role_name": "admin"  },  {    "role_name": "sales"  }]
 
 
-# Logout (POST)
-curl -X POST http://127.0.0.1:5000/auth/logout
-# Expected Response: { "message": "Logout successful.", "status": "success" }
-
-
-# Assign Role to User (POST, Super Admin Only) NW
-curl -X POST http://127.0.0.1:5000/auth/assign-role -H "Content-Type: application/json" -d "{\"username\": \"testuser2\", \"role\": \"Finance\"}"
-# Expected Response: { "message": "Role assigned successfully.", "status": "success" }
-
-# Update Profile (PUT) NW
-curl -X PUT http://127.0.0.1:5000/auth/profile -H "Content-Type: application/json" -d "{\"username\": \"testuser2\", \"email\": \"test@example.com\"}"
-# Expected Response: { "message": "Profile updated successfully.", "status": "success" }
-
 
 # Fetch All Modules: NW
 curl -X GET http://127.0.0.1:5000/modules
 # Expected Response:[  {    "module_name": "Sales"  },  {    "module_name": "Sourcing"  },  {    "module_name": "Ops Head"  }]
 
-# Get Modules (GET) NW
-curl -X GET http://127.0.0.1:5000/module/list
-# Expected Response: { "modules": [...] }
+
+# Assign Role to User (POST, Super Admin Only)
+curl -X POST http://127.0.0.1:5000/auth/assign-role -H "Content-Type: application/json" -d "{\"username\": \"testuser2\", \"role\": \"Sales\"}"
+# Expected Response: { "message": "Role assigned successfully.", "status": "success" }
+
+
+
+
+
+
+
+#  test the Super Admin login: 
+curl -X POST http://127.0.0.1:5000/auth/login -H "Content-Type: application/json" -d "{\"username\": \"superadmin\", \"password\": \"123\"}"
+Expected response: {    "message": "Login successful",    "status": "success",    "role": "Super Admin"}
+
+
+# User Registration (POST)
+curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"testuser3\", \"password\": \"testpassword3\", \"role\": \"sales\"}"
+# Expected Response: { "message": "User registered successfully.", "status": "success" }
+
+
+# User Login (POST)
+curl -X POST http://127.0.0.1:5000/auth/login -H "Content-Type: application/json" -d "{\"username\": \"testuser3\", \"password\": \"123\"}"
+# Expected Response: if user is approved { "message": "Login successful.", "token": "<JWT_TOKEN>" }
+# Expected Response: If the user is not approved yet:{  "error": "User not approved by Super Admin."}
+
+# Approve User (POST, Super Admin Only)
+curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"testuser3\"}"
+# Expected Response: { "message": "User approved successfully.", "status": "success" }
+
+
+# Logout (POST)
+curl -X POST http://127.0.0.1:5000/auth/logout
+# Expected Response: { "message": "Logout successful.", "status": "success" }
+
+
+#Fetch Accessible Modules for a User:
+curl -X GET http://127.0.0.1:5000/modules/user/sales_test
+# Expected Response:[  {    "module_name": "Sales"  }]
+
+############### NW ##################
+
+# Add Module (POST, Super Admin Only):NW
+curl -X POST http://127.0.0.1:5000/module/add -H "Content-Type: application/json" -d "{\"name\": \"Test module\", \"description\": \"Finance module description\"}"
+# Expected Response: { "message": "Module added successfully.", "status": "success" }
+
+
+
 
 # Add Role (POST, Super Admin Only) NW
-curl -X POST http://127.0.0.1:5000/role/add -H "Content-Type: application/json" -d "{\"name\": \"Tech\", \"permissions\": [\"view_logs\", \"manage_access\"]}"
+curl -X POST http://127.0.0.1:5000/role/add -H "Content-Type: application/json" -d "{\"name\": \"Tech_test\", \"permissions\": [\"view_logs\", \"manage_access\"]}"
 # Expected Response: { "message": "Role added successfully.", "status": "success" }
 
 
-
-#Fetch Accessible Modules for a User: NW
-curl -X GET http://127.0.0.1:5000/modules/user/testuser
-# Expected Response:[  {    "module_name": "Sales"  }]
 
 
 
@@ -109,7 +93,7 @@ curl -X POST http://127.0.0.1:5000/setup/dummy_data
 #Expected Response: {  "message": "Dummy roles and modules created successfully."}
 
 
-#Fetch All Dummy Users
+#Fetch All Dummy Users: NW
 curl -X GET http://127.0.0.1:5000/users/dummies
 #Expected Response:[  {    "username": "admin_dummy",    "role": "admin",    "status": "approved"  },  {    "username": "sales_dummy",    "role": "sales",    "status": "approved"  }]
 
