@@ -2,6 +2,7 @@
 
 import os
 from datetime import datetime
+from pymongo import MongoClient
 
 class AppConfig:
     """
@@ -18,7 +19,6 @@ class AppConfig:
     # Default is set to connect to a local MongoDB server
     DB_URI = os.getenv("DB_URI", "mongodb://localhost:27017/hq_database")
 
- 
 
     # Application Secret Key
     # Used for session management and general application security
@@ -50,3 +50,9 @@ class AppConfig:
     # Logging Level
     # Default logging level is INFO
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+
+ # Initialize MongoDB client and database
+client = MongoClient(AppConfig.DB_URI)
+db = client["hq_database"]  # Assign the database instance
+print(client)

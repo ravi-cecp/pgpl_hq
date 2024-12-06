@@ -13,15 +13,14 @@ db = client["hq_app"]
 
 user_bp = Blueprint("user", __name__)
 
-user_model = UserModel(db)
-user_service = UserService(user_model)
+#user_model = UserModel(db)
+#user_service = UserService(user_model)
 
 
 @user_bp.route("/users", methods=["GET"])
 def get_all_users():
-    users = user_service.get_all_users()
-    return jsonify(users), 200
-
+    users = UserModel.get_all_users()
+    return jsonify(users)
 
 @user_bp.route("/users/approve/<user_id>", methods=["POST"])
 def approve_user(user_id):

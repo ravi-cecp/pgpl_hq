@@ -1,10 +1,22 @@
-# models/role_model.py
-# UTC Timestamp: 2024-12-05 00:00
-# Defines the schema for roles in the application.
+from configs.settings import db
 
-from configs.database import db
+class Role:
+    def __init__(self, name, description=None):
+        self.name = name
+        self.permission = permission
+        self.description = description
 
-class Role(db.Document):
-    name = db.StringField(required=True, unique=True)
-    description = db.StringField()
-# End of role_model.py
+    @staticmethod
+    def insert_role(data):
+        """Insert a new role into the database."""
+        db.roles.insert_one(data)
+
+    @staticmethod
+    def get_all_roles():
+        """Retrieve all roles from the database."""
+        return list(db.roles.find({}, {"_id": 0}))
+
+    @staticmethod
+    def find_role(name):
+        """Find a specific role by name."""
+        return db.roles.find_one({"name": name}, {"_id": 0})

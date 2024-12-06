@@ -9,49 +9,44 @@ from configs.settings import AppConfig
 
 client = MongoClient(AppConfig.DB_URI)
 db = client[AppConfig.DB_NAME]
+users_collection = db["users"]
 
-def register_user(data):
-    username = data['username']
-    password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
-    role = data['role']
+from models.user_model import UserModel
 
-    if db.users.find_one({"username": username}):
-        raise ValueError("User already exists")
+def register_user(username, password, role):
+    existing_user = UserModel.find_user_by_username(username)
+    if existing_user:
+        return {"message": f"User '{username}' already exists", "status": "error"}
+
+    UserModel.create_user(username, password, role, status="pending")
+    return {"message": f"User '{username}' registered successfully. Awaiting approval.", "status": "success"}
+
+def approve_user_service(username):
+    user = UserModel.find_user_by_username(username)
+    if not user:
+        return {"message": f"User '{username}' does not exist", "status": "error"}
+    if user.get("status") == "active":
+        return {"message": f"User '{username}' is already approved.", "status": "error"}
+
+    UserModel.update_user_status(username, "active")
+    return {"message": f"User '{username}' has been approved successfully.", "status": "success"}
+
+def login_user(username, password):
+    user = UserModel.find_user_by_username(username)
+    if not user:
+        return {"message": "Invalid username or password", "status": "error"}
+    if user.get("status") == "pending":
+        return {"message": "User not approved by Super Admin", "status": "error"}
+    if user.get("status") == "suspended":
+        return {"message": "User account is suspended", "status": "error"}
+
+    # Password verification logic here...
+    return {"message": "Login successful!", "status": "success", "role": user.get("role")}
+  
     
-    user = {
-        "username": username,
-        "password": password,
-        "role": role,
-        "approved": False
-    }
-    db.users.insert_one(user)
-    return {"username": username, "role": role}
-
-def login_user(data):
-    username = data['username']
-    password = data['password']
-    user = db.users.find_one({"username": username})
-
-    if not user or not bcrypt.checkpw(password.encode('utf-8'), user['password']):
-        raise ValueError("Invalid username or password")
-    
-    if not user['approved']:
-        raise ValueError("User not approved by Super Admin")
-
-    return {"user_id": str(user['_id']), "role": user['role']}
-
 def get_user_role(user_id):
     user = db.users.find_one({"_id": user_id})
     if not user:
         raise ValueError("User not found")
     return user['role']
 
-
-def approve_user(username):
-    user = db.users.find_one({"username": username})
-    if not user:
-        return {"error": f"User '{username}' not found."}, 404
-    if user.get("approved"):
-        return {"message": f"User '{username}' is already approved."}
-    db.users.update_one({"username": username}, {"$set": {"approved": True}})
-    return {"message": f"User '{username}' has been approved."}
