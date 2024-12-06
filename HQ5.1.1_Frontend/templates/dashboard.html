@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <div id="modules"></div>
+    <script>
+        $(document).ready(function () {
+            const role = new URLSearchParams(window.location.search).get('role');
+
+            const modules = {
+                "Super Admin": ["Manage Users", "Sales", "Sourcing", "Ops Head", "Logistics", "Finance"],
+                "Admin": ["Manage Users"],
+                "Sales": ["Sales"],
+                "Sourcing": ["Sourcing"],
+                "Ops Head": ["Sourcing", "Ops Head", "Logistics"],
+                "Logistics": ["Logistics"],
+                "Finance": ["Finance"]
+            };
+
+            if (modules[role]) {
+                modules[role].forEach(module => {
+                    $('#modules').append(`<div>${module}</div>`);
+                });
+            } else {
+                $('#modules').append(`<div>No modules available</div>`);
+            }
+        });
+    </script>
+</body>
+</html>

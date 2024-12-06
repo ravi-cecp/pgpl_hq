@@ -1,0 +1,85 @@
+# HQ_Test_Endpoints_Curl_Final.txt
+
+# This file contains all the curl commands to test the endpoints for the HQ application, 
+# along with the expected responses.
+
+# Base End point
+curl -X GET http://127.0.0.1:5000/
+# Expected Response {  "message": "HQ Backend is running!"}
+
+
+# User Registration (POST)
+curl -X POST http://127.0.0.1:5000/auth/register -H "Content-Type: application/json" -d "{\"username\": \"testuser\", \"password\": \"testpassword\", \"role\": \"admin\"}"
+# Expected Response: { "message": "User registered successfully.", "status": "success" }
+
+# User Login (POST)
+curl -X POST http://127.0.0.1:5000/auth/login -H "Content-Type: application/json" -d "{\"username\": \"testuser\", \"password\": \"testpassword\"}"
+# Expected Response: if user is approved { "message": "Login successful.", "token": "<JWT_TOKEN>" }
+# Expected Response: If the user is not approved yet:{  "error": "User not approved by Super Admin."}
+
+
+# Approve User (POST, Super Admin Only)
+curl -X POST http://127.0.0.1:5000/auth/approve -H "Content-Type: application/json" -d "{\"username\": \"testuser\"}"
+# Expected Response: { "message": "User approved successfully.", "status": "success" }
+
+
+# Fetch All Users Endpoint (Super Admin Only)
+curl -X GET http://127.0.0.1:5000/users
+# Expected response: [   {    "username": "testuser",    "role": "admin",    "status": "approved"  },  {    "username": "user2",    "role": "sales",    "status": "pending"  }]
+
+
+# Add Module (POST, Super Admin Only)
+curl -X POST http://127.0.0.1:5000/module/add -H "Content-Type: application/json" -d "{\"name\": \"Finance\", \"description\": \"Finance module description\"}"
+# Expected Response: { "message": "Module added successfully.", "status": "success" }
+
+# Get Modules (GET)
+curl -X GET http://127.0.0.1:5000/module/list
+# Expected Response: { "modules": [...] }
+
+# Add Role (POST, Super Admin Only)
+curl -X POST http://127.0.0.1:5000/role/add -H "Content-Type: application/json" -d "{\"name\": \"Finance\", \"permissions\": [\"view_reports\", \"manage_invoices\"]}"
+# Expected Response: { "message": "Role added successfully.", "status": "success" }
+
+# Get Roles (GET)
+curl -X GET http://127.0.0.1:5000/role/list
+# Expected Response:[  {    "role_name": "super_admin"  },  {    "role_name": "admin"  },  {    "role_name": "sales"  }]
+
+
+# Assign Role to User (POST, Super Admin Only)
+curl -X POST http://127.0.0.1:5000/auth/assign-role -H "Content-Type: application/json" -d "{\"username\": \"testuser\", \"role\": \"Finance\"}"
+# Expected Response: { "message": "Role assigned successfully.", "status": "success" }
+
+# Update Profile (PUT)
+curl -X PUT http://127.0.0.1:5000/auth/profile -H "Content-Type: application/json" -d "{\"username\": \"testuser\", \"email\": \"test@example.com\"}"
+# Expected Response: { "message": "Profile updated successfully.", "status": "success" }
+
+
+# Fetch All Modules
+curl -X GET http://127.0.0.1:5000/modules
+# Expected Response:[  {    "module_name": "Sales"  },  {    "module_name": "Sourcing"  },  {    "module_name": "Ops Head"  }]
+
+
+#Fetch Accessible Modules for a User
+curl -X GET http://127.0.0.1:5000/modules/user/testuser
+# Expected Response:[  {    "module_name": "Sales"  }]
+
+
+# Logout (POST)
+curl -X POST http://127.0.0.1:5000/auth/logout
+# Expected Response: { "message": "Logout successful.", "status": "success" }
+
+
+#Test Protected Endpoint (JWT Required)
+curl -X GET http://127.0.0.1:5000/protected -H "Authorization: Bearer <auth_token>"
+#Expected Response: If the token is valid: {  "message": "You have accessed a protected route."}
+#Expected Response: if the token is invalid or expired: {  "error": "Invalid or expired token."}
+
+# Test Create Dummy Data for Roles and Modules
+curl -X POST http://127.0.0.1:5000/setup/dummy_data
+#Expected Response: {  "message": "Dummy roles and modules created successfully."}
+
+
+#Fetch All Dummy Users
+curl -X GET http://127.0.0.1:5000/users/dummies
+#Expected Response:[  {    "username": "admin_dummy",    "role": "admin",    "status": "approved"  },  {    "username": "sales_dummy",    "role": "sales",    "status": "approved"  }]
+

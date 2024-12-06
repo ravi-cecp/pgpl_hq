@@ -1,0 +1,21 @@
+<!-- templates/approve_users.html -->
+<!-- UTC Timestamp: 2024-12-05 12:34 -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Approve Users</h2>
+<table>
+    <tr>
+        <th>Username</th>
+        <th>Action</th>
+    </tr>
+    {% for user in pending_users %}
+    <tr>
+        <td>{{ user.username }}</td>
+        <td>
+            <button onclick="approveUser('{{ user.id }}')">Approve</button>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<script src="/static/js/main.js"></script>
+{% endblock %}
