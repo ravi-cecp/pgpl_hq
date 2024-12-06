@@ -11,3 +11,4 @@ python-dotenv
 pytest
 pytest-mock
 requests
+PyJWT==2.7.0
